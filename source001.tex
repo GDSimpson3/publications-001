@@ -1,0 +1,189 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx} 
+\geometry{margin=1in}
+
+\title{The Mathematics behind the Linear Regression}
+\author{Gavin Simpson}
+\date{\today}
+
+
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+What is a linear regression? essentially with a linear regression, we are aiming to find a linear relationship between two variables (2 Dimensional for now) and fit a line through the data points with the best accuracy possible - now with this line we can interpolate and extrapolate to our needs.
+
+
+\subsection{Equation of the Regression Line}
+As this is a linear regression, the equation of the best fit line is going to be a simple linear function
+
+\begin{equation}
+    y = mx + c
+\end{equation}
+
+where:
+\begin{itemize}
+    \item \textbf{m} (\(\beta_1\)) is the gradient
+    \item \textbf{c} (\(\beta_0\)) is the bias
+\end{itemize}
+
+In this Regression line, there are \textit{two} \textbf{parameters}, (\(\beta_0\)) and (\(\beta_1\)). The algorithm searches for the line of best fit by tweaking these two parameters until a line of best fit is found.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{linearFunction.png}
+    \caption{Visualised linear function}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Initial Regression Line}
+
+When the linear regression algorithm starts, the parameters are given initial values - these tend to be starting points for the algorithm to work with, suitable values exemplify:
+\begin{itemize}
+    \item \(\beta_1\) = 2
+    \item \(\beta_0\) = 1
+\end{itemize}
+
+
+\subsection{Evaluating a Regression Line}
+
+To evaluate our regression line - we use a \textbf{Loss function}, one of the most common ones is the \textbf{MSE} (Mean squared error). 
+
+\subsubsection{MSE}
+To calculate the MSE, we simply sum the squares of differences between our predicted value and the observed value (dataset value). The formula is
+
+\[
+\text{MSE(parameters)} = \frac{1}{n} \sum_{i=1}^{n} (\hat{y}_i - y_i)^2
+\]
+
+where:
+\begin{itemize}
+    \item \(\hat{y}_i\) is the Predicted Value \(f(x_i)\)
+    \item \(y_i\) is the Observed Value (from our Dataset)
+    \item Summation: Represents going through all the values of the dataset
+\end{itemize}
+
+This loss function could be expanded as:
+
+\[
+\text{MSE(\(\beta_0\), \(\beta_1\))} = \frac{1}{n} \sum_{i=1}^{n} (\beta_1x_i + \beta_0 - y_i)^2
+\]
+
+where:
+\begin{itemize}
+    \item \(\hat{y}_i\) has been expanded as \(\beta_1x_i + \beta_0\)
+\end{itemize}
+
+
+\section{Parameter Optimisation}
+
+The task here is to find the two parameters (\(\beta_0\), \(\beta_1\)), which will give us the lowest MSE. One way to do this is to perform the gradient descent in order to find the minimum parameters that lead to the lowest value on our MSE Loss function. How does this concept work? We can start by visualising our Loss landscape of the MSE.
+
+\subsection{Visualising our Loss Landscape}
+If we plot on a 3D axis
+\begin{itemize}
+    \item \(\beta_0\), 
+    \item \(\beta_1\)
+    \item MSE
+\end{itemize}
+We will get the landscape of our loss function - with this, we can see how different values of \(\beta_0\) (b), \(\beta_1\) (m) will impact our MSE. Here is a simple example of what the MSE could look like 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{MSE_LossLandscape.png}
+    \caption{Loss Landscape of the MSE (b = \(\beta_0\), m = \(\beta_1\))}
+    \label{fig:placeholder}
+\end{figure}
+
+The Loss landscape is a plane; with this - we wish to find the minimum points/pits of this loss landscape - it is easier to conceptualize upon visualization.
+
+\section{The gradient Descent}
+
+The gradient descent is an iterative mathematic method used to find the minimum point of a function by going in steps to the opposite direction of the gradient until we hit a minimum point. An analogy to conceptualize this is to \textit{imagine dropping a ball onto a surface, the ball will keep rolling until it rests at the lowest point of the surface - similar idea here.}
+\\\\
+Right away we can see one main issue with the gradient descent - \textbf{local minimas}. If the surface has many local minimum points along with the \textit{global minima}, the algorithm might get trapped and converge into a local minima instead of the global minima, hence making sure the starting points are randomized is a work around for this.
+
+\subsection{The gradient Descent Exemplified with a Quadratic Function}
+
+Assume we have a linear quadratic function and we wish to find it's minimum point VIA the gradient descent. Here is how the algorithm will work.
+
+\begin{enumerate}
+    \item Start at a starting point - the intial X value
+    \item The gradient will tell you the direction of the minimum point - if there's a negative gradient, that means the curve is sloping downwards towards the minimum, if there's a positive gradient, that means the curve is sloping upwards away from the minimum.
+    \item Hence, our \textbf{steps} must be in the \textbf{opposite direction} of the gradient.
+    \item How big must our steps be? Well there are two neat tricks for this
+    \begin{enumerate}
+        \item At the minimum point of the function, the curve has a gradient of 0 \\\\ \(\frac{dy}{dx} = 0\) \\\\ and as the function approaches the minimum point, the gradient too tends to 0, this naturally helps us to converge the step length as we approach the minimum.
+        \item The learning rate: (\(\alpha\)), on our iteration formula, we add a coefficient, the alpha, to control the step rate so that 
+    \end{enumerate}
+    \item Hence with these in mind, the iteration formula will be:
+    
+\[x = x - \alpha \cdot \frac{dy}{dx} \Big|_{x=x}\]
+        
+\end{enumerate}
+
+
+
+
+\section{The Gradient Descent on a Bivariate Loss Function (MSE)}
+
+We are going to apply the same concept on our Loss function
+
+\[
+\text{MSE(\(\beta_0\), \(\beta_1\))} = \frac{1}{n} \sum_{i=1}^{n} (\beta_1x_i + \beta_0 - y_i)^2
+\]
+
+But this time, its bivariate (a function with 2 variables), hence if we are going to use the gradient descent, we'll have to use \textbf{Partial Derivatives}
+
+\subsection{What are Partial Derivatives?}
+A partial derivative simply measures the rate of change of the whole function, with respects to just one variable whilst keeping the others constant. With our MSE:
+
+\begin{itemize}
+    \item We simply take a constant \(\beta_0\), and find the value of \(\beta_1\) that gives the lowest MSE for that \(\beta_0\)
+    \item and then we find the \(\beta_0\) that gives use the lowest MSE for that \(\beta_1\)
+\end{itemize}
+
+
+Hence with the iteration step, there will be two iterations conducted, one with respects to \(\beta_0\) and another with respects to \(\beta_1\)
+
+\[\beta_0 = \beta_0 - \alpha \cdot \frac{\partial}{\partial\beta_0} \Big|_{\beta_0, \beta_1}\]
+
+\[\beta_1 = \beta_1 - \alpha \cdot \frac{\partial}{\partial\beta_1} \Big|_{\beta_0, \beta_1}\]
+
+\subsection{Computing the Partial Derivatives}
+we can use methods of calculus such as simply chain rules to differentiate them - whilst treating the other variable simply as a constant.
+
+\[
+\text{MSE(\(\beta_0\), \(\beta_1\))} = \frac{1}{n} \sum_{i=1}^{n} (\beta_1x_i + \beta_0 - y_i)^2
+\]
+
+
+\[
+\frac{\partial}{\partial\beta_0} \Big|_{\beta_0, \beta_1} = \frac{2}{n} \sum_{i=1}^{n} (\beta_1x_i + \beta_0 - y_i)^1 \cdot1
+\]
+
+\[
+\frac{\partial}{\partial\beta_1} \Big|_{\beta_0, \beta_1} = \frac{2}{n} \sum_{i=1}^{n} (\beta_1x_i + \beta_0 - y_i)^1 \cdot x_i
+\]
+
+
+With this, we can use an iterative formula to find the parameters (\(\beta_0, \beta_1\)) that give the lowest MSE.
+
+\section{Further Resources}
+I've done further work on Polynomial and dynamic power law regressions - checkout these links and my projects for more on this.
+\begin{itemize}
+    \item Polynomial Regression Implementation: \href{https://github.com/GDSimpson3/Polynomial-regression-001-impl}{Github Repository}
+    \item Linear Regression Tutorial: \href{https://www.youtube.com/watch?v=y5PBAsUJsTo}{Youtube Link}
+    \item Linear Regression Implementation: \href{https://github.com/GDSimpson3/LinearRegression-From-Scratch}{Github Repository}
+\end{itemize}
+
+Thank you for reading this, I hope it helped!!
+
+\end{document}
